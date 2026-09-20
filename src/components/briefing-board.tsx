@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { AlertTriangle, ListFilter } from "lucide-react";
 
@@ -13,8 +14,9 @@ import {
   groupByConfirmation,
   tabQuestion,
 } from "@/lib/filters";
+import { briefingHref, parseOiParam } from "@/lib/href";
 import { focusQueue, oiFreshness } from "@/lib/session";
-import { defaultFilters, type FilterState, type TabId } from "@/lib/types";
+import { defaultFilters, type FilterState, type TabId, type Universe } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const tabs: { id: TabId; label: string; short: string }[] = [
@@ -24,6 +26,10 @@ const tabs: { id: TabId; label: string; short: string }[] = [
   { id: "price", label: "等待价格确认", short: "等价格" },
   { id: "risk", label: "风险与分歧", short: "风险" },
 ];
+
+function parseTab(raw: string | null): TabId {
+  return tabs.some((item) => item.id === raw) ? (raw as TabId) : "focus";
+}
 
 const groupCopy: Record<
   ReturnType<typeof groupByConfirmation>[number]["key"],
@@ -36,18 +42,38 @@ const groupCopy: Record<
   not_updated: { hint: "尚未更新 ≠ 没有确认，不能当成削弱或撤销", bar: "bg-[var(--pending)]" },
 };
 
-export function BriefingBoard() {
-  const [tab, setTab] = useState<TabId>("focus");
-  const [filters, setFilters] = useState<FilterState>(defaultFilters);
+export function BriefingBoard({
+  initialTab,
+  initialOi,
+  initialUniverse,
+}: {
+  initialTab?: string;
+  initialOi?: string;
+  initialUniverse?: string;
+}) {
+  const tab = parseTab(initialTab ?? null);
+  const universe: Universe = initialUniverse === "watchlist" ? "watchlist" : "all";
+  const oiStatus = parseOiParam(initialOi);
+  const [extraFilters, setExtraFilters] = useState<FilterState>(defaultFilters);
   const session = briefing;
   const fresh = oiFreshness(session.symbols);
   const queue = focusQueue(session.symbols);
   const counts = countByTab(session.symbols);
 
   const results = useMemo(
-    () => filterSymbols(session.symbols, tab, filters),
-    [session.symbols, tab, filters],
+    () =>
+      filterSymbols(session.symbols, tab, {
+        ...extraFilters,
+        universe,
+        oiStatus,
+      }),
+    [session.symbols, tab, extraFilters, universe, oiStatus],
   );
+  const filters: FilterState = {
+    ...extraFilters,
+    universe,
+    oiStatus,
+  };
   const filterLabels = activeFilterLabels(filters);
   const oiGroups = tab === "oi" ? groupByConfirmation(results) : [];
   const activeTab = tabs.find((item) => item.id === tab)!;
@@ -81,19 +107,20 @@ export function BriefingBoard() {
       <div
         role="tablist"
         aria-label="盘前问题"
-        className="sticky top-12 z-20 -mx-4 flex gap-1 overflow-x-auto border-b border-white/10 bg-[#0e1219]/95 px-4 backdrop-blur sm:-mx-6 sm:px-6 lg:top-0"
+        className="sticky top-12 z-20 -mx-4 flex gap-1 overflow-x-auto border-b border-white/10 bg-[#0e1219]/95 px-4 backdrop-blur sm:-mx-6 sm:px-6 lg:static lg:top-auto"
       >
         {tabs.map((item) => {
           const selected = tab === item.id;
           return (
-            <button
+            <Link
               key={item.id}
-              type="button"
+              href={briefingHref({ tab: item.id, universe, oiStatus })}
+              scroll={false}
               role="tab"
               aria-selected={selected}
-              onClick={() => setTab(item.id)}
+              data-testid={`tab-${item.id}`}
               className={cn(
-                "relative flex min-w-28 shrink-0 flex-col items-start gap-0.5 px-3 py-2.5 text-left text-sm transition-colors",
+                "relative flex min-h-14 min-w-32 shrink-0 flex-col items-start justify-center gap-0.5 px-3 py-2 text-left text-sm transition-colors",
                 selected ? "text-foreground" : "text-muted-foreground hover:text-foreground",
               )}
             >
@@ -105,12 +132,12 @@ export function BriefingBoard() {
               {selected ? (
                 <span className="absolute inset-x-3 -bottom-px h-0.5 bg-[var(--tos-orange)]" />
               ) : null}
-            </button>
+            </Link>
           );
         })}
       </div>
 
-      <div className="space-y-4">
+      <div key={tab} className="space-y-4" data-active-tab={tab}>
         <div className="flex flex-wrap items-start justify-between gap-2">
           <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
             <span className="mr-2 text-foreground">{activeTab.label}</span>
@@ -125,8 +152,8 @@ export function BriefingBoard() {
         <FilterBar
           tab={tab}
           filters={filters}
-          onChange={setFilters}
-          onReset={() => setFilters({ ...defaultFilters, universe: filters.universe })}
+          onChange={setExtraFilters}
+          onReset={() => setExtraFilters(defaultFilters)}
         />
 
         {filterLabels.length > 0 ? (

@@ -1190,8 +1190,8 @@ export const briefing: BriefingSession = {
     status: "parsed",
     summary:
       "已整理进 8:45 盘前页。PDF 只作当天原始摘要和存档，不再当作阅读入口。",
-    symbolCount: 16,
-    oiUpdated: 14,
+    symbolCount: 17,
+    oiUpdated: 15,
     oiPending: 2,
   },
 };

@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { X } from "lucide-react";
 
 import { Chip, FilterGroup } from "@/components/filter-chip";
 import { Input } from "@/components/ui/input";
+import { briefingHref, toggleOi } from "@/lib/href";
 import type { FilterState, OiStatus, OptionSide, StrikeLocation, TabId, Tenor } from "@/lib/types";
 
 function toggle<T>(list: T[], value: T): T[] {
@@ -31,27 +33,38 @@ export function FilterBar({
         <div className="text-xs text-muted-foreground">
           Tab 负责分问题，Filter 负责缩小范围。空着表示不限制。
         </div>
-        <button
-          type="button"
+        <Link
+          href={briefingHref({ tab })}
+          scroll={false}
+          data-testid="filter-reset"
           onClick={onReset}
           className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
         >
           <X className="size-3" />
           清空筛选
-        </button>
+        </Link>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <FilterGroup label="范围">
           <Chip
             pressed={filters.universe === "watchlist"}
-            onClick={() => onChange({ ...filters, universe: "watchlist" })}
+            testId="filter-universe-watchlist"
+            href={briefingHref({
+              tab,
+              universe: "watchlist",
+              oiStatus: filters.oiStatus,
+            })}
           >
             自选股
           </Chip>
           <Chip
             pressed={filters.universe === "all"}
-            onClick={() => onChange({ ...filters, universe: "all" })}
+            href={briefingHref({
+              tab,
+              universe: "all",
+              oiStatus: filters.oiStatus,
+            })}
           >
             全部标的
           </Chip>
@@ -79,10 +92,13 @@ export function FilterBar({
               <Chip
                 key={value}
                 tone={tone}
+                testId={`filter-oi-${value}`}
                 pressed={filters.oiStatus.includes(value)}
-                onClick={() =>
-                  onChange({ ...filters, oiStatus: toggle(filters.oiStatus, value) })
-                }
+                href={briefingHref({
+                  tab,
+                  universe: filters.universe,
+                  oiStatus: toggleOi(filters.oiStatus, value),
+                })}
               >
                 {label}
               </Chip>
