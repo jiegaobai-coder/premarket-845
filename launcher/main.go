@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -75,20 +76,39 @@ func main() {
 	_, _ = fmt.Scanln()
 }
 
+func looksLikeRoot(candidate string) bool {
+	if candidate == "" {
+		return false
+	}
+	if _, err := os.Stat(filepath.Join(candidate, "package.json")); err != nil {
+		return false
+	}
+	_, err := os.Stat(filepath.Join(candidate, "src", "data", "briefing.ts"))
+	return err == nil
+}
+
 func findRoot() (string, error) {
 	exe, err := os.Executable()
 	if err != nil {
 		return "", err
 	}
 	dir := filepath.Dir(exe)
-	for _, candidate := range []string{dir, filepath.Dir(dir), mustAbs(".")} {
-		if _, err := os.Stat(filepath.Join(candidate, "package.json")); err == nil {
-			if _, err := os.Stat(filepath.Join(candidate, "src", "data", "briefing.ts")); err == nil {
-				return candidate, nil
-			}
+	for _, name := range []string{"打开8-45盘前.dir", "premarket-root.txt", ".premarket-root.txt"} {
+		raw, readErr := os.ReadFile(filepath.Join(dir, name))
+		if readErr != nil {
+			continue
+		}
+		pointed := strings.TrimSpace(string(raw))
+		if looksLikeRoot(pointed) {
+			return pointed, nil
 		}
 	}
-	return "", fmt.Errorf("找不到项目文件夹。请把这个 exe 放在 8:45 盘前项目根目录再打开")
+	for _, candidate := range []string{dir, filepath.Dir(dir), mustAbs("."), "/workspace"} {
+		if looksLikeRoot(candidate) {
+			return candidate, nil
+		}
+	}
+	return "", fmt.Errorf("找不到项目文件夹。把 exe 放在项目根目录，或在旁边放一份 打开8-45盘前.dir 写上项目路径")
 }
 
 func mustAbs(p string) string {
