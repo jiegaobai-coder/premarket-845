@@ -22,12 +22,35 @@ PDF 仍保留在「PDF 存档」里，只作当天摘要和核对原文。
 
 第一次会跑 `npm install`，稍等一会儿。
 
-也可以手动：
+## 怎么放到你的 Windows 电脑（给 Codex 接手）
 
-```bash
+现在这份代码在 Cursor 云里的临时 Git 上。云端页面右上角右键 Copy，**不会**把 exe 放进 Windows 剪贴板，所以桌面没有 Paste。
+
+正确做法：
+
+1. 在 Cursor 里点 **Create repo**，把项目存成你自己的 GitHub / GitLab 仓库。
+2. 在 Windows 上 clone 到本地，例如：
+
+```bat
+cd %USERPROFILE%\Documents
+git clone <你的仓库地址> premarket-845
+cd premarket-845
+npm install
+```
+
+3. 双击项目里的 **`放到桌面.bat`**。它会把 `8-45盘前.exe` 拷到桌面，并写上项目路径。
+4. 用 Cursor 或 Codex **打开这个本地文件夹**。权限用完后，Codex 接管的是你电脑上的这份代码，不是云虚拟机。
+
+不要只拷一个 exe。exe 要能找到整个项目才能启动页面。
+
+手动启动也可以：
+
+```bat
 npm install
 npm run dev
 ```
+
+然后浏览器打开 http://127.0.0.1:8451
 
 ## 页面怎么用
 
