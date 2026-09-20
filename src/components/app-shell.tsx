@@ -34,7 +34,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
           </div>
         </div>
         <p className="mt-3 text-xs leading-5 text-muted-foreground">
-          打开首页只回答一件事：今天先看哪几只，为什么看，还缺什么确认。
+          每天 8:45 打开看。不会到点自动换新数据，名单跟着当天那份 PDF。
         </p>
       </div>
 

@@ -48,8 +48,7 @@ export function ArchiveBoard() {
         <p className="mt-4 text-sm leading-6 text-foreground/90">{item.summary}</p>
         <p className="mt-3 text-xs leading-5 text-muted-foreground">
           源路径：C:\Users\gaoji\OneDrive\Documents\TOS\{item.filename}
-          。这个云环境读不到你本机文件，所以先用 9/18 这份已经整理过的观察名单。之后可以把每天的 PDF
-          解析结果放进 <code className="text-foreground">src/data/briefing.ts</code>。
+          。8:45 是每天打开来看的时刻；换了新的一天 PDF 并写进数据后，存档才会多一条。
         </p>
       </article>
 

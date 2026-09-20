@@ -92,6 +92,11 @@ export function BriefingBoard({
             {session.yesterdaySession} 的线索，用 {session.asOf} 的 OI 修正。
             PDF（{session.sourcePdf}）只作存档，不在这里继续往下读。
           </p>
+          <p className="mt-2 max-w-2xl rounded-md border border-[var(--tos-orange)]/30 bg-[var(--tos-orange)]/10 px-3 py-2 text-sm leading-6 text-foreground/90">
+            8:45 是每天打开来看的时刻，不是自动刷新时间。当前名单来自
+            {session.archive.generatedAt} 生成的 {session.sourcePdf}
+            。换了第二天的 PDF 并写进数据后，这里才会变成新的一天。
+          </p>
         </div>
         <div className="grid grid-cols-3 gap-2 text-xs">
           <Stat label="今日先看" value={`${queue.length} 只`} />
