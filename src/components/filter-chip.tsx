@@ -28,7 +28,7 @@ export function Chip({
               : tone === "down"
                 ? "border-[var(--down)] bg-[var(--down)]/15 text-[var(--down)]"
                 : "border-[var(--tos-orange)] bg-[var(--tos-orange)]/20 text-[var(--tos-orange)]"
-          : "border-white/10 bg-white/3 text-muted-foreground hover:border-white/20 hover:text-foreground",
+          : "border-white/25 bg-black/30 text-foreground/75 hover:border-white/40 hover:text-foreground",
       )}
     >
       {children}

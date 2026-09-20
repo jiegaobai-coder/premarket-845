@@ -2,12 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Archive,
-  Clock3,
-  Crosshair,
-  Menu,
-} from "lucide-react";
+import { Archive, Clock3, Crosshair, Menu } from "lucide-react";
 import { useState } from "react";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -102,19 +97,20 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <div className="flex min-h-full bg-background">
-      <aside className="hidden w-60 shrink-0 border-r border-white/10 bg-[var(--sidebar-bg)] lg:flex lg:flex-col">
+      <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 overflow-y-auto border-r border-white/10 bg-[var(--sidebar-bg)] lg:flex lg:flex-col">
         <NavLinks />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-3 border-b border-white/10 px-3 py-2 lg:hidden">
+        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-white/10 bg-[#0e1219]/95 px-3 py-2 backdrop-blur lg:hidden">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
               aria-label="打开导航"
-              className="inline-flex size-8 items-center justify-center rounded-lg text-foreground hover:bg-white/5"
+              className="inline-flex size-8 items-center justify-center rounded-lg border border-white/20 text-foreground hover:bg-white/5"
             >
               <Menu className="size-4" />
             </SheetTrigger>
@@ -122,7 +118,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <NavLinks onNavigate={() => setOpen(false)} />
             </SheetContent>
           </Sheet>
-          <div className="text-sm font-medium">8:45 盘前分析</div>
+          <Link
+            href="/"
+            className={cn(
+              "text-sm font-medium",
+              pathname === "/" ? "text-[var(--tos-orange)]" : "text-foreground",
+            )}
+          >
+            8:45 盘前
+          </Link>
+          <Link
+            href="/archive"
+            className={cn(
+              "text-sm",
+              pathname === "/archive" ? "text-[var(--tos-orange)]" : "text-muted-foreground",
+            )}
+          >
+            PDF 存档
+          </Link>
         </header>
         <main className="flex-1">{children}</main>
       </div>

@@ -7,6 +7,16 @@ export function symbolMatchesTab(symbol: SymbolBrief, tab: TabId): boolean {
   return symbol.tabs.includes(tab);
 }
 
+export function countByTab(symbols: SymbolBrief[]): Record<TabId, number> {
+  return {
+    focus: symbols.filter((s) => symbolMatchesTab(s, "focus")).length,
+    oi: symbols.filter((s) => symbolMatchesTab(s, "oi")).length,
+    structure: symbols.filter((s) => symbolMatchesTab(s, "structure")).length,
+    price: symbols.filter((s) => symbolMatchesTab(s, "price")).length,
+    risk: symbols.filter((s) => symbolMatchesTab(s, "risk")).length,
+  };
+}
+
 function matchingContracts(symbol: SymbolBrief, filters: FilterState) {
   return symbol.contracts.filter((c) => {
     if (filters.oiStatus.length && !filters.oiStatus.includes(c.oiStatus)) return false;
